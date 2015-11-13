@@ -1,6 +1,6 @@
 import unittest
-from tools import retry, timeout
-from exception import ContinuousFailureException, TimeoutException
+from robust.tools import retry, timeout
+from robust.exception import ContinuousFailureException, TimeoutException
 
 
 class RetryCase(unittest.TestCase):

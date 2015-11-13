@@ -1,5 +1,5 @@
 from functools import wraps
-from exception import ContinuousFailureException, TimeoutException
+from robust.exception import ContinuousFailureException, TimeoutException
 
 
 def _fail(ex, on_fail=None):
