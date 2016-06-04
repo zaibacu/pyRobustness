@@ -1,8 +1,9 @@
 import signal
+import threading
 from contextlib import contextmanager
 
 
-def alarm_create(timeout, callback):
+def _signal_timer(timeout, callback):
     signal.signal(signal.SIGALRM, callback)
     signal.alarm(timeout)
 
@@ -10,6 +11,20 @@ def alarm_create(timeout, callback):
         return signal.alarm(0)
 
     return reset
+
+
+def _threading_timer(timeout, callback):
+    timer = threading.Timer(timeout, callback)
+    timer.start()
+
+    def reset():
+        return timer.cancel()
+
+    return reset
+
+
+def alarm_create(timeout, callback):
+    return _signal_timer(timeout, callback)
 
 
 @contextmanager
