@@ -66,7 +66,7 @@ def breaker(limit, revive, on_fail=None):
         import signal
         counter = 0
 
-        def revive_handler():
+        def revive_handler(signum, frame):
             nonlocal counter
             counter -= 1
 
