@@ -112,3 +112,6 @@ class TestBreakerPattern(object):
 
         with raises(RuntimeError):
             fail()
+
+        with raises(ConnectionCutException):
+            fail()

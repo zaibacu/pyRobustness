@@ -63,7 +63,12 @@ def breaker(limit, revive, on_fail=None):
     """
 
     def injector(fn):
+        import signal
         counter = 0
+
+        def revive_handler():
+            nonlocal counter
+            counter -= 1
 
         @wraps(fn)
         def wrapper(*args, **kwargs):
@@ -71,11 +76,19 @@ def breaker(limit, revive, on_fail=None):
             if counter > limit:
                 return _fail(ConnectionCutException, on_fail)
 
+            result = None
             try:
-                return fn(*args, **kwargs)
+                result = fn(*args, **kwargs)
             except Exception:
                 counter += 1
+                if counter > limit:
+                    signal.signal(signal.SIGALRM, revive_handler)
+                    signal.alarm(revive)
                 raise
+            else:
+                signal.alamr(0)
+                counter = 0
+                return result
 
         return wrapper
 
