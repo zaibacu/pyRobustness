@@ -81,11 +81,11 @@ class TestBreakerPattern(object):
 
         with raises(ConnectionCutException):
             counter = 0
-            for i in range(0, 5):
+            while True:
                 try:
                     fail()
                 except RuntimeError:
                     pass
                 counter += 1
 
-        assert counter == 5
+        assert counter > 5
