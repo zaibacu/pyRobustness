@@ -88,7 +88,7 @@ class TestBreakerPattern(object):
                     pass
                 counter += 1
 
-        assert counter > 5
+        assert counter == 5
 
     def test_revive_after_1_second(self):
         import time
@@ -114,4 +114,23 @@ class TestBreakerPattern(object):
             fail()
 
         with raises(ConnectionCutException):
+            fail()
+
+    def test_revive_with_timeout(self):
+        import time
+
+        @breaker(limit=1, revive=2)
+        @timeout(1)
+        def fail():
+            time.sleep(2)
+
+        with raises(TimeoutException):
+            fail()
+
+        with raises(ConnectionCutException):
+            fail()
+
+        time.sleep(2)
+
+        with raises(TimeoutException):
             fail()

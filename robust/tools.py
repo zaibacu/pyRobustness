@@ -73,7 +73,7 @@ def breaker(limit, revive, on_fail=None):
         @wraps(fn)
         def wrapper(*args, **kwargs):
             nonlocal counter
-            if counter > limit:
+            if counter >= limit:
                 return _fail(ConnectionCutException, on_fail)
 
             result = None
@@ -81,12 +81,12 @@ def breaker(limit, revive, on_fail=None):
                 result = fn(*args, **kwargs)
             except Exception:
                 counter += 1
-                if counter > limit:
+                if counter >= limit:
                     signal.signal(signal.SIGALRM, revive_handler)
                     signal.alarm(revive)
                 raise
             else:
-                signal.alamr(0)
+                signal.alarm(0)
                 counter = 0
                 return result
 
