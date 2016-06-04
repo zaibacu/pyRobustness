@@ -1,5 +1,5 @@
 from pytest import raises
-from robust.tools import retry, timeout
+from robust.tools import retry, timeout, breaker
 from robust.exception import ContinuousFailureException, TimeoutException
 
 
@@ -73,7 +73,7 @@ class TestBreakerPattern(object):
 
     def test_cut_after_5_failures(self):
 
-        @breaker(fail_count=5, check=30)
+        @breaker(limit=5, revive=30)
         def fail():
             raise RuntimeError("Just failing for no good reason")
 
