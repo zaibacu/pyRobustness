@@ -59,3 +59,22 @@ def breaker(limit, revive, on_fail=None):
     After :revive: seconds it allows one connection to pass.
     If it succeeds - counter is reset, if doesn't - we wait another :revive: seconds
     """
+
+    def injector(fn):
+        counter = 0
+
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            nonlocal counter
+            if counter > limit:
+                pass
+
+            try:
+                return fn(*args, **kwargs)
+            except Exception:
+                counter += 1
+                raise
+
+        return wrapper
+
+    return injector

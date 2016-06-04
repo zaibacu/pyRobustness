@@ -1,6 +1,8 @@
 from pytest import raises
 from robust.tools import retry, timeout, breaker
-from robust.exception import ContinuousFailureException, TimeoutException
+from robust.exception import (ContinuousFailureException,
+                              TimeoutException,
+                              ConnectionCutException)
 
 
 class TestRetryCase(object):
