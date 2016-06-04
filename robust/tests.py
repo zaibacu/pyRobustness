@@ -89,3 +89,26 @@ class TestBreakerPattern(object):
                 counter += 1
 
         assert counter > 5
+
+    def test_revive_after_1_second(self):
+        import time
+
+        @breaker(limit=2, revive=1)
+        def fail():
+            raise RuntimeError("Failing and failing")
+
+        while True:
+            try:
+                fail()
+            except RuntimeError:
+                pass
+            except ConnectionCutException:
+                break
+
+        with raises(ConnectionCutException):
+            fail()
+
+        time.sleep(1)
+
+        with raises(RuntimeError):
+            fail()
