@@ -51,3 +51,11 @@ def timeout(limit, on_fail=None):
 
         return wrapper
     return injector
+
+
+def breaker(limit, revive, on_fail=None):
+    """
+    Allows :limit: failures, after which it cuts connection.
+    After :revive: seconds it allows one connection to pass.
+    If it succeeds - counter is reset, if doesn't - we wait another :revive: seconds
+    """
