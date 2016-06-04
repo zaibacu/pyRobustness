@@ -26,8 +26,12 @@ def _threading_timer(timeout, callback):
     return reset
 
 
-def alarm_create(timeout, callback):
-    return _signal_timer(timeout, callback)
+def alarm_create(timeout, callback, use_signal=True):
+    import platform
+    if use_signal and platform.system() != "Windows":  # SIGALRM does not work on Windows
+        return _signal_timer(timeout, callback)
+    else:
+        return _threading_timer(timeout, callback)
 
 
 @contextmanager
