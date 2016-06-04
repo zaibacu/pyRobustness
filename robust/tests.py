@@ -148,7 +148,7 @@ class TestTimers(object):
             reached = True
 
         _signal_timer(1, callback)
-        time.sleep(1)
+        time.sleep(2)
         assert reached
 
     def test_threading_timer(self):
@@ -161,5 +161,5 @@ class TestTimers(object):
             reached = True
 
         _threading_timer(1, callback)
-        time.sleep(1)
+        time.sleep(2)
         assert reached
