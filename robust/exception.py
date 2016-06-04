@@ -4,3 +4,7 @@ class ContinuousFailureException(Exception):
 
 class TimeoutException(Exception):
     pass
+
+
+class ConnectionCutException(Exception):
+    pass

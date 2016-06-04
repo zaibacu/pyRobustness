@@ -1,5 +1,7 @@
 from functools import wraps
-from robust.exception import ContinuousFailureException, TimeoutException
+from robust.exception import (ContinuousFailureException,
+                              TimeoutException,
+                              ConnectionCutException)
 
 
 def _fail(ex, on_fail=None):
@@ -19,7 +21,7 @@ def retry(limit, on_fail=None):
             for _ in range(0, limit):
                 try:
                     return fn(*args, **kwargs)
-                except:
+                except Exception:
                     continue
 
             # If you're here - you deserved it
@@ -34,20 +36,57 @@ def timeout(limit, on_fail=None):
     Waits for function to respond N seconds
     """
     def injector(fn):
-        import signal
+        from robust.alarm import alarm_context
 
-        def timeout_handler(signum, frame):
+        def timeout_handler():
             return _fail(TimeoutException, on_fail)
 
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(limit)
-
-            try:
+            with alarm_context(limit, timeout_handler):
                 return fn(*args, **kwargs)
-            finally:
-                signal.alarm(0)
 
         return wrapper
+    return injector
+
+
+def breaker(limit, revive, on_fail=None):
+    """
+    Allows :limit: failures, after which it cuts connection.
+    After :revive: seconds it allows one connection to pass.
+    If it succeeds - counter is reset, if doesn't - we wait another :revive: seconds
+    """
+
+    def injector(fn):
+        from robust.alarm import alarm_create
+        counter = 0
+        reset_fn = None
+
+        def revive_handler():
+            nonlocal counter
+            counter -= 1
+
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            nonlocal counter
+            nonlocal reset_fn
+            if counter >= limit:
+                return _fail(ConnectionCutException, on_fail)
+
+            result = None
+            try:
+                result = fn(*args, **kwargs)
+            except Exception:
+                counter += 1
+                if counter >= limit:
+                    reset_fn = alarm_create(revive, revive_handler)
+                raise
+            else:
+                if reset_fn:
+                    reset_fn()
+                counter = 0
+                return result
+
+        return wrapper
+
     return injector
