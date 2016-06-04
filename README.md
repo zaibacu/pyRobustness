@@ -74,5 +74,5 @@ Version History
 ===============
 - 1.1: 
      - Additional type for alarm - threading to support Windows OS, or certain cases when signal is not working as supposed
-     - CircuitBreaker pattern, inspired by speech by Daniel Martins @Pycon 2016
+     - CircuitBreaker pattern, inspired by speech by Daniel Riti @Pycon 2016
 - 1.0: Initial version
