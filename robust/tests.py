@@ -1,22 +1,24 @@
-import unittest
+from pytest import raises
 from robust.tools import retry, timeout
 from robust.exception import ContinuousFailureException, TimeoutException
 
 
-class RetryCase(unittest.TestCase):
+class TestRetryCase(object):
+
     def test_happy_case(self):
         @retry(5)
         def dummy():
             return 42
 
-        self.assertEqual(42, dummy())
+        assert 42 == dummy()
 
     def test_fail_case(self):
         @retry(5)
         def fail():
             raise RuntimeError("Don't know what to do")
 
-        self.assertRaises(ContinuousFailureException, fail)
+        with raises(ContinuousFailureException):
+            fail()
 
     def test_callback(self):
         passed = False
@@ -30,16 +32,17 @@ class RetryCase(unittest.TestCase):
             raise RuntimeError("Don't know what to do")
 
         do_pass()
-        self.assertEqual(True, passed)
+        assert passed
 
 
-class TimeoutCase(unittest.TestCase):
+class TestTimeoutCase(object):
+
     def test_happy_case(self):
         @timeout(1)
         def dummy():
             return 42
 
-        self.assertEqual(42, dummy())
+        assert 42 == dummy()
 
     def test_failure_case(self):
         @timeout(1)
@@ -47,7 +50,8 @@ class TimeoutCase(unittest.TestCase):
             while True:
                 pass
 
-        self.assertRaises(TimeoutException, fail)
+        with raises(TimeoutException):
+            fail()
 
     def test_callback(self):
         passed = False
@@ -62,6 +66,4 @@ class TimeoutCase(unittest.TestCase):
                 pass
 
         do_pass()
-        self.assertEqual(True, passed)
-
-
+        assert passed
