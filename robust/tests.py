@@ -67,3 +67,20 @@ class TestTimeoutCase(object):
 
         do_pass()
         assert passed
+
+
+class TestBreakerPattern(object):
+
+    def test_cut_after_5_failures(self):
+
+        @breaker(fail_count=5, check=30)
+        def fail():
+            raise RuntimeError("Just failing for no good reason")
+
+        with raises(ConnectionCutException):
+            counter = 0
+            for i in range(0, 5):
+                fail()
+                counter += 1
+
+        assert counter == 5
