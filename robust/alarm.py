@@ -4,7 +4,10 @@ from contextlib import contextmanager
 
 
 def _signal_timer(timeout, callback):
-    signal.signal(signal.SIGALRM, callback)
+    def wrapper(*args):
+        return callback()
+
+    signal.signal(signal.SIGALRM, wrapper)
     signal.alarm(timeout)
 
     def reset():

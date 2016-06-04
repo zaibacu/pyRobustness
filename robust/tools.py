@@ -38,7 +38,7 @@ def timeout(limit, on_fail=None):
     def injector(fn):
         from robust.alarm import alarm_context
 
-        def timeout_handler(signum, frame):
+        def timeout_handler():
             return _fail(TimeoutException, on_fail)
 
         @wraps(fn)
@@ -62,7 +62,7 @@ def breaker(limit, revive, on_fail=None):
         counter = 0
         reset_fn = None
 
-        def revive_handler(signum, frame):
+        def revive_handler():
             nonlocal counter
             counter -= 1
 
