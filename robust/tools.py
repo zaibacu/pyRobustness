@@ -1,5 +1,7 @@
 from functools import wraps
-from robust.exception import ContinuousFailureException, TimeoutException
+from robust.exception import (ContinuousFailureException,
+                              TimeoutException,
+                              ConnectionCutException)
 
 
 def _fail(ex, on_fail=None):
@@ -67,7 +69,7 @@ def breaker(limit, revive, on_fail=None):
         def wrapper(*args, **kwargs):
             nonlocal counter
             if counter > limit:
-                pass
+                return _fail(ConnectionCutException, on_fail)
 
             try:
                 return fn(*args, **kwargs)
