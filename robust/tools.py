@@ -36,20 +36,15 @@ def timeout(limit, on_fail=None):
     Waits for function to respond N seconds
     """
     def injector(fn):
-        import signal
+        from robust.alarm import alarm_context
 
         def timeout_handler(signum, frame):
             return _fail(TimeoutException, on_fail)
 
         @wraps(fn)
         def wrapper(*args, **kwargs):
-            signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(limit)
-
-            try:
+            with alarm_context(limit, timeout_handler):
                 return fn(*args, **kwargs)
-            finally:
-                signal.alarm(0)
 
         return wrapper
     return injector
@@ -63,8 +58,9 @@ def breaker(limit, revive, on_fail=None):
     """
 
     def injector(fn):
-        import signal
+        from robust.alarm import alarm_create
         counter = 0
+        reset_fn = None
 
         def revive_handler(signum, frame):
             nonlocal counter
@@ -73,6 +69,7 @@ def breaker(limit, revive, on_fail=None):
         @wraps(fn)
         def wrapper(*args, **kwargs):
             nonlocal counter
+            nonlocal reset_fn
             if counter >= limit:
                 return _fail(ConnectionCutException, on_fail)
 
@@ -82,11 +79,11 @@ def breaker(limit, revive, on_fail=None):
             except Exception:
                 counter += 1
                 if counter >= limit:
-                    signal.signal(signal.SIGALRM, revive_handler)
-                    signal.alarm(revive)
+                    reset_fn = alarm_create(revive, revive_handler)
                 raise
             else:
-                signal.alarm(0)
+                if reset_fn:
+                    reset_fn()
                 counter = 0
                 return result
 
