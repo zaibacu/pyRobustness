@@ -134,3 +134,32 @@ class TestBreakerPattern(object):
 
         with raises(TimeoutException):
             fail()
+
+
+class TestTimers(object):
+
+    def test_signal_timer(self):
+        import time
+        from robust.alarm import _signal_timer
+        reached = False
+
+        def callback():
+            nonlocal reached
+            reached = True
+
+        _signal_timer(1, callback)
+        time.sleep(1)
+        assert reached
+
+    def test_threading_timer(self):
+        import time
+        from robust.alarm import _threading_timer
+        reached = False
+
+        def callback():
+            nonlocal reached
+            reached = True
+
+        _threading_timer(1, callback)
+        time.sleep(1)
+        assert reached
