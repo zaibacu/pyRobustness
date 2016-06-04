@@ -33,7 +33,46 @@ from robust.tools import retry
 def very_broken_method():
     print(".")
     raise RuntimeError("Something is broken...")
-    
-very_broken_method()
+
+while True:
+    very_broken_method()
 
 ```
+
+Circuit Breaker example:
+
+```python
+import time
+from robust.tools import breaker
+
+counter = 0
+
+@breaker(limit=5, revive=5)
+def very_broken_method():
+    nonlocal counter
+    if counter <= 5:
+        counter += 1
+    	raise RuntimeError("Something is broken...")
+    else:
+        print("We've made it!")
+
+
+while True:
+    try:
+    	very_broken_method()
+    except RuntimeError:
+        pass
+    except Exception:
+        break
+
+time.sleep(5)
+very_broken_method()
+```
+
+
+Version History
+===============
+- 1.1: 
+     - Additional type for alarm - threading to support Windows OS, or certain cases when signal is not working as supposed
+     - CircuitBreaker pattern, inspired by speech by Daniel Martins @Pycon 2016
+- 1.0: Initial version
