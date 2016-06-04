@@ -19,7 +19,7 @@ def retry(limit, on_fail=None):
             for _ in range(0, limit):
                 try:
                     return fn(*args, **kwargs)
-                except:
+                except Exception:
                     continue
 
             # If you're here - you deserved it
