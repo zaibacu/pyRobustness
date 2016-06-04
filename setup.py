@@ -7,7 +7,7 @@ from pip.exceptions import InstallationError
 from robust.version import get_version
 
 try:
-    install_reqs = list(parse_requirements("requirements", session={}))
+    install_reqs = list(parse_requirements("requirements.txt", session={}))
 except InstallationError:
     # There are no requirements
     install_reqs = []
@@ -21,5 +21,5 @@ setup(name="pyrobustness",
       url="https://github.com/zaibacu/pyRobustness",
       packages=["robust"],
       install_requires=[str(ir.req) for ir in install_reqs],
-      test_suite="nose.collector",
-      tests_require=["nose"])
+      test_suite="pytest",
+      tests_require=["pytest"])
