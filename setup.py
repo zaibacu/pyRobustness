@@ -5,15 +5,11 @@ try:
     from pip._internal.req import parse_requirements
 except:
     from pip.req import parse_requirements
-from pip.exceptions import InstallationError
 
 from robust.version import get_version
 
-try:
-    install_reqs = list(parse_requirements("requirements.txt", session={}))
-except InstallationError:
-    # There are no requirements
-    install_reqs = []
+install_reqs = list(parse_requirements("requirements.txt", session={}))
+
 
 setup(name="pyrobustness",
       version=get_version(),
