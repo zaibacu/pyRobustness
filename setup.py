@@ -1,7 +1,10 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 from setuptools import setup
-from pip.req import parse_requirements
+try:
+    from pip._internal.req import parse_requirements
+except:
+    from pip.req import parse_requirements
 from pip.exceptions import InstallationError
 
 from robust.version import get_version
