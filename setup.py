@@ -10,10 +10,15 @@ from robust.version import get_version
 
 install_reqs = list(parse_requirements("requirements.txt", session={}))
 
+with open("README.md", "r") as f:
+    long_description = f.read()
+
 
 setup(name="pyrobustness",
       version=get_version(),
       description="A simple util library for creating applications which needs to keep running, despite abnormalities",
+      long_description=long_description,
+      long_description_content_type="text/markdown",
       author="Šarūnas Navickas",
       author_email="zaibacu@gmail.com",
       license="MIT",
